@@ -85,10 +85,7 @@ def main(argc, argv):
     print("                    written by Jason Coombs")
     print("                   Copyright Signetics  1992\n\n")
 
-    try:
-        open(OUTPUT_FILENAME, 'w')
-    except Exception:
-        pass
+    truncate(OUTPUT_FILENAME)
 
     if argc == 1:
         print(
@@ -764,6 +761,13 @@ def res2des(resval):
 
     init.close()
     return None
+
+
+def truncate(filename):
+    """
+    Unconditionally ensure the named file exists and is truncated.
+    """
+    open(filename, 'w').close()
 
 
 if __name__ == '__main__':
