@@ -28,6 +28,14 @@ buf = ''
 
 OUTPUT_FILENAME = "esdsort.dat"
 
+banner = """
+
+                 ESD data file sorting utility
+                    written by Jason Coombs
+                   Copyright Signetics  1992
+
+"""
+
 
 def main(argc, argv):
     class Type:
@@ -81,10 +89,7 @@ def main(argc, argv):
     # files
     infile = statfile = resultfile = None
 
-    print("\n\n                 ESD data file sorting utility")
-    print("                    written by Jason Coombs")
-    print("                   Copyright Signetics  1992\n\n")
-
+    print(banner)
     truncate(OUTPUT_FILENAME)
 
     if argc == 1:
