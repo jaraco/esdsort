@@ -26,6 +26,8 @@ MAXNAME = 17
 
 buf = ''
 
+OUTPUT_FILENAME = "esdsort.dat"
+
 
 def main(argc, argv):
     class Type:
@@ -84,7 +86,7 @@ def main(argc, argv):
     print("                   Copyright Signetics  1992\n\n")
 
     try:
-        open("esdsort.dat", 'w')
+        open(OUTPUT_FILENAME, 'w')
     except Exception:
         pass
 
@@ -110,10 +112,10 @@ def main(argc, argv):
             else:
                 print("Processing file %s\n" % argv)
                 try:
-                    statfile = open("esdsort.dat", "a")
+                    statfile = open(OUTPUT_FILENAME, "a")
                 except Exception:
                     print(
-                        "Cannot open output file %s." % "esdsort.dat",
+                        "Cannot open output file %s." % OUTPUT_FILENAME,
                         file=sys.stderr)
                     sys.exit(1)
                 else:
@@ -209,7 +211,7 @@ def main(argc, argv):
                             elif failcode == 315:
                                 part[part_count].failtype.cont += 1
                             elif failcode == 938:
-                                print("Identity fail.  Check status file esdsort.dat")
+                                print("Identity fail.  Check status file", OUTPUT_FILENAME)
                                 print(
                                     "Identity fail on sn%d" % part[part_count].sn,
                                     file=statfile)
