@@ -98,155 +98,7 @@ def main(argc, argv):
             "of the file to be sorted.",
             file=sys.stderr)
     else:
-        while True:
-            argc -= 1
-            if argc == 0:
-                break
-            argv = argv[1:]
-            try:
-                infile = open(argv[0])
-            except Exception:
-                print(
-                    "Can't open %s.\nPlease check path and filename."
-                    % argv[0],
-                    file=sys.stderr)
-                sys.exit(1)
-            else:
-                print("Processing file %s\n" % argv)
-                try:
-                    statfile = open(OUTPUT_FILENAME, "a")
-                except Exception:
-                    print(
-                        "Cannot open output file %s." % OUTPUT_FILENAME,
-                        file=sys.stderr)
-                    sys.exit(1)
-                else:
-                    while True:
-                        inline = infile.read(MAXLINE)
-                        if not inline:
-                            break
-                        position = textfind(inline, "@")
-                        if position != EOF:
-                            position += 1
-                            count = 0
-                            while inline[position + count] != ' ':
-                                tempstring[count:count+1] = inline[position + count]
-                                count += 1
-                            tempstring[count:count+1] = '\x00'
-                            part[part_count].voltage = atoi(tempstring)
-                            if tempstring[1].upper() == 'K':
-                                part[part_count].voltage = part[part_count].voltage * 1000
-
-                        position = textfind(inline, "S/N")
-                        if position != EOF:
-                            position = position + 6
-                            part_count += 1
-                            part[part_count].sr = 'N'
-                            part[part_count].failtype.icc = \
-                                part[part_count].failtype.ipd = \
-                                part[part_count].failtype.inph = \
-                                part[part_count].failtype.inpl = \
-                                part[part_count].failtype.iodh = \
-                                part[part_count].failtype.iodl = \
-                                part[part_count].failtype.iozh = \
-                                part[part_count].failtype.iozl = \
-                                part[part_count].failtype.odh = \
-                                part[part_count].failtype.odl = \
-                                part[part_count].failtype.ozh = \
-                                part[part_count].failtype.ozl = \
-                                part[part_count].failtype.cont = 0
-                            part[part_count].pass_ = 'Y'
-
-                            if inline[position] == ' ':
-                                if inline[position+1] == ' ':
-                                    position = position + 2
-                                else:
-                                    position = position + 1
-
-                            count = 0
-                            while count < 4:
-                                tempstring[count:count+1] = inline[position + count]
-                                count += 1
-
-                            tempstring[count:count+1] = '\x00'
-                            part[part_count].sn = atoi(tempstring)
-                            if ser2pro(part[part_count].sn) is not None:
-                                part[part_count].processname = \
-                                    ser2pro(part[part_count].sn)
-                                part[part_count].process = part[part_count].processname[0]
-                            else:
-                                part[part_count].processname = "P Process"
-                                part[part_count].process = 'P'
-
-                        if textfind(inline, "   ****") != EOF:
-                            part[part_count].pass_ = 'N'
-                            count = 0
-                            while count < 3:
-                                tempstring[count:count+1] = inline[count + 3]
-                                count += 1
-                            tempstring[count:count+1] = '\x00'
-                            failcode = atoi(tempstring)
-                            if failcode == 860 or failcode == 881:
-                                part[part_count].failtype.icc += 1
-                            elif failcode == 790 or failcode == 813:
-                                part[part_count].failtype.ipd += 1
-                            elif failcode == 524:
-                                part[part_count].failtype.inph += 1
-                            elif failcode == 544:
-                                part[part_count].failtype.inpl += 1
-                            elif failcode == 615:
-                                part[part_count].failtype.iodh += 1
-                            elif failcode == 634:
-                                part[part_count].failtype.iodl += 1
-                            elif failcode == 574:
-                                part[part_count].failtype.iozh += 1
-                            elif failcode == 593:
-                                part[part_count].failtype.iozl += 1
-                            elif failcode == 697:
-                                part[part_count].failtype.odh += 1
-                            elif failcode == 716:
-                                part[part_count].failtype.odl += 1
-                            elif failcode == 656:
-                                part[part_count].failtype.ozh += 1
-                            elif failcode == 675:
-                                part[part_count].failtype.ozl += 1
-                            elif failcode == 315:
-                                part[part_count].failtype.cont += 1
-                            elif failcode == 938:
-                                print("Identity fail.  Check status file", OUTPUT_FILENAME)
-                                print(
-                                    "Identity fail on sn%d" % part[part_count].sn,
-                                    file=statfile)
-                                print(
-                                    "Zapped at %d volts\n" % part[part_count].voltage,
-                                    file=statfile)
-                            else:
-                                print("Error!!!  Undefined fail code %d." % failcode)
-
-                        if textfind(inline, "938") == 4:
-                            count = 0
-                            while count < 3:
-                                tempstring[count:count+1] = inline[14 + count]
-                                count += 1
-                            tempstring[count:count+1] = '\x00'
-                            part[part_count].resval = atoi(tempstring)
-                            if res2des(part[part_count].resval) is not None:
-                                part[part_count].designname = \
-                                    res2des(part[part_count].resval)
-                                part[part_count].design = part[part_count].designname[0]
-                            else:
-                                part[part_count].designname = "D Design"
-                                part[part_count].design = 'D'
-
-                        if textfind(inline, "FAIL") == 20:
-                            part[part_count].pass_ = 'N'
-                            part[part_count].sr = 'Y'
-                        else:
-                            part[part_count].sr = 'N'
-
-            print("Sorting successful!\n")
-            infile.close()
-            statfile.close()
+        part_count = count_parts(argc, argv, part, part_count, tempstring)
 
     if part_count > 0:
         print("Total parts: %d" % part_count)
@@ -652,6 +504,159 @@ def main(argc, argv):
                     despage = chr(ord(despage) + 1)
                 position += 1
             resultfile.close()
+
+
+def count_parts(argc, argv, part, part_count, tempstring):
+    while True:
+        argc -= 1
+        if argc == 0:
+            break
+        argv = argv[1:]
+        try:
+            infile = open(argv[0])
+        except Exception:
+            print(
+                "Can't open %s.\nPlease check path and filename."
+                % argv[0],
+                file=sys.stderr)
+            sys.exit(1)
+        else:
+            print("Processing file %s\n" % argv)
+            try:
+                statfile = open(OUTPUT_FILENAME, "a")
+            except Exception:
+                print(
+                    "Cannot open output file %s." % OUTPUT_FILENAME,
+                    file=sys.stderr)
+                sys.exit(1)
+            else:
+                while True:
+                    inline = infile.read(MAXLINE)
+                    if not inline:
+                        break
+                    position = textfind(inline, "@")
+                    if position != EOF:
+                        position += 1
+                        count = 0
+                        while inline[position + count] != ' ':
+                            tempstring[count:count + 1] = inline[position + count]
+                            count += 1
+                        tempstring[count:count + 1] = '\x00'
+                        part[part_count].voltage = atoi(tempstring)
+                        if tempstring[1].upper() == 'K':
+                            part[part_count].voltage = part[part_count].voltage * 1000
+
+                    position = textfind(inline, "S/N")
+                    if position != EOF:
+                        position = position + 6
+                        part_count += 1
+                        part[part_count].sr = 'N'
+                        part[part_count].failtype.icc = \
+                            part[part_count].failtype.ipd = \
+                            part[part_count].failtype.inph = \
+                            part[part_count].failtype.inpl = \
+                            part[part_count].failtype.iodh = \
+                            part[part_count].failtype.iodl = \
+                            part[part_count].failtype.iozh = \
+                            part[part_count].failtype.iozl = \
+                            part[part_count].failtype.odh = \
+                            part[part_count].failtype.odl = \
+                            part[part_count].failtype.ozh = \
+                            part[part_count].failtype.ozl = \
+                            part[part_count].failtype.cont = 0
+                        part[part_count].pass_ = 'Y'
+
+                        if inline[position] == ' ':
+                            if inline[position + 1] == ' ':
+                                position = position + 2
+                            else:
+                                position = position + 1
+
+                        count = 0
+                        while count < 4:
+                            tempstring[count:count + 1] = inline[position + count]
+                            count += 1
+
+                        tempstring[count:count + 1] = '\x00'
+                        part[part_count].sn = atoi(tempstring)
+                        if ser2pro(part[part_count].sn) is not None:
+                            part[part_count].processname = \
+                                ser2pro(part[part_count].sn)
+                            part[part_count].process = part[part_count].processname[0]
+                        else:
+                            part[part_count].processname = "P Process"
+                            part[part_count].process = 'P'
+
+                    if textfind(inline, "   ****") != EOF:
+                        part[part_count].pass_ = 'N'
+                        count = 0
+                        while count < 3:
+                            tempstring[count:count + 1] = inline[count + 3]
+                            count += 1
+                        tempstring[count:count + 1] = '\x00'
+                        failcode = atoi(tempstring)
+                        if failcode == 860 or failcode == 881:
+                            part[part_count].failtype.icc += 1
+                        elif failcode == 790 or failcode == 813:
+                            part[part_count].failtype.ipd += 1
+                        elif failcode == 524:
+                            part[part_count].failtype.inph += 1
+                        elif failcode == 544:
+                            part[part_count].failtype.inpl += 1
+                        elif failcode == 615:
+                            part[part_count].failtype.iodh += 1
+                        elif failcode == 634:
+                            part[part_count].failtype.iodl += 1
+                        elif failcode == 574:
+                            part[part_count].failtype.iozh += 1
+                        elif failcode == 593:
+                            part[part_count].failtype.iozl += 1
+                        elif failcode == 697:
+                            part[part_count].failtype.odh += 1
+                        elif failcode == 716:
+                            part[part_count].failtype.odl += 1
+                        elif failcode == 656:
+                            part[part_count].failtype.ozh += 1
+                        elif failcode == 675:
+                            part[part_count].failtype.ozl += 1
+                        elif failcode == 315:
+                            part[part_count].failtype.cont += 1
+                        elif failcode == 938:
+                            print("Identity fail.  Check status file", OUTPUT_FILENAME)
+                            print(
+                                "Identity fail on sn%d" % part[part_count].sn,
+                                file=statfile)
+                            print(
+                                "Zapped at %d volts\n" % part[part_count].voltage,
+                                file=statfile)
+                        else:
+                            print("Error!!!  Undefined fail code %d." % failcode)
+
+                    if textfind(inline, "938") == 4:
+                        count = 0
+                        while count < 3:
+                            tempstring[count:count + 1] = inline[14 + count]
+                            count += 1
+                        tempstring[count:count + 1] = '\x00'
+                        part[part_count].resval = atoi(tempstring)
+                        if res2des(part[part_count].resval) is not None:
+                            part[part_count].designname = \
+                                res2des(part[part_count].resval)
+                            part[part_count].design = part[part_count].designname[0]
+                        else:
+                            part[part_count].designname = "D Design"
+                            part[part_count].design = 'D'
+
+                    if textfind(inline, "FAIL") == 20:
+                        part[part_count].pass_ = 'N'
+                        part[part_count].sr = 'Y'
+                    else:
+                        part[part_count].sr = 'N'
+
+        print("Sorting successful!\n")
+        infile.close()
+        statfile.close()
+    return part_count
 
 
 def filecopy(infile):
