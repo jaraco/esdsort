@@ -10,6 +10,8 @@
 
 import sys
 import ctypes
+import itertools
+import functools
 
 FAIL = 0
 PASS = 1
@@ -693,18 +695,37 @@ def textfind(line, text):
     return EOF
 
 
+def get_digits(s):
+    """
+    Return all digits appearing at the beginning of s
+    """
+    def is_digit(char):
+        return char.isdigit()
+
+    return itertools.takewhile(is_digit, s)
+
+
+def ord_zero(digit):
+    """
+    Return the ordinal of the given digit.
+
+    >>> ord_zero('1')
+    1
+    """
+    return ord(digit) - ord('0')
+
+
+def ten_x(a, b):
+    return a*10 + b
+
+
 def atoi(s):
     """
     Convert list of characters s to integer value
     """
-    n = 0
-    i = 0
-
-    while s[i] >= '0' and s[i] <= '9':
-        n = 10*n + ord(s[i]) - ord('0')
-        i += 1
-
-    return n
+    digits = get_digits(s)
+    ordinals = map(ord_zero, digits)
+    return functools.reduce(ten_x, ordinals, 0)
 
 
 def ser2pro(sn):
