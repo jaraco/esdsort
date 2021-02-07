@@ -74,7 +74,6 @@ def main(argv):
 
     part = [Part() for _ in range(MAXPARTS)]
 
-    tempstring = []
     propage = ''
     despage = ''
 
@@ -102,7 +101,7 @@ def main(argv):
             "of the file to be sorted.",
             file=sys.stderr)
     else:
-        part_count = count_parts(argv, part, part_count, tempstring)
+        part_count = count_parts(argv, part, part_count)
 
     if part_count <= 0:
         return
@@ -512,7 +511,9 @@ def main(argv):
     resultfile.close()
 
 
-def count_parts(argv, part, part_count, tempstring):
+def count_parts(argv, part, part_count):
+    tempstring = []
+
     while True:
         argv = argv[1:]
         if not argv:
