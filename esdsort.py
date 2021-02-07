@@ -534,10 +534,7 @@ def count_parts(argv):
                 file=sys.stderr)
             sys.exit(1)
 
-        while True:
-            inline = infile.read(MAXLINE)
-            if not inline:
-                break
+        for inline in infile:
             position = textfind(inline, "@")
             if position != EOF:
                 position += 1
