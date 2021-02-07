@@ -78,7 +78,6 @@ def main(argv):
     despage = ''
 
     position = 0
-    part_count = 0
     count = 0
     i = 0
     e = 0
@@ -95,13 +94,7 @@ def main(argv):
     print(banner)
     truncate(OUTPUT_FILENAME)
 
-    if len(argv) == 1:
-        print(
-            "Please re-enter command line with the name "
-            "of the file to be sorted.",
-            file=sys.stderr)
-    else:
-        part_count = count_parts(argv, part, part_count)
+    part_count = count_parts(argv, part)
 
     if part_count <= 0:
         return
@@ -511,8 +504,16 @@ def main(argv):
     resultfile.close()
 
 
-def count_parts(argv, part, part_count):
+def count_parts(argv, part):
     tempstring = []
+    part_count = 0
+
+    if len(argv) == 1:
+        print(
+            "Please re-enter command line with the name "
+            "of the file to be sorted.",
+            file=sys.stderr)
+        return part_count
 
     while True:
         argv = argv[1:]
