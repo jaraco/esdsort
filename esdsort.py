@@ -515,20 +515,17 @@ def count_parts(argv, part):
             file=sys.stderr)
         return part_count
 
-    while True:
-        argv = argv[1:]
-        if not argv:
-            break
+    for filename in argv[1:]:
         try:
-            infile = open(argv[0])
+            infile = open(filename)
         except Exception:
             print(
                 "Can't open %s.\nPlease check path and filename."
-                % argv[0],
+                % filename,
                 file=sys.stderr)
             sys.exit(1)
 
-        print("Processing file %s\n" % argv)
+        print("Processing file %s\n" % filename)
         try:
             statfile = open(OUTPUT_FILENAME, "a")
         except Exception:
