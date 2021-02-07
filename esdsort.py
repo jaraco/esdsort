@@ -39,35 +39,38 @@ banner = """
 """
 
 
+class Type:
+    icc = 0
+    ipd = 0
+    inph = 0
+    inpl = 0
+    iodh = 0
+    iodl = 0
+    iozh = 0
+    iozl = 0
+    odh = 0
+    odl = 0
+    ozh = 0
+    ozl = 0
+    cont = 0
+
+
+class Part:
+    sn = 0
+    voltage = 0
+    pass_ = chr(0)
+    sr = chr(0)
+    resval = 0
+    design = chr(0)
+    process = chr(0)
+
+    def __init__(self):
+        self.processname = ctypes.create_string_buffer(MAXNAME)
+        self.designname = ctypes.create_string_buffer(MAXNAME)
+        self.failtype = Type()
+
+
 def main(argc, argv):
-    class Type:
-        icc = 0
-        ipd = 0
-        inph = 0
-        inpl = 0
-        iodh = 0
-        iodl = 0
-        iozh = 0
-        iozl = 0
-        odh = 0
-        odl = 0
-        ozh = 0
-        ozl = 0
-        cont = 0
-
-    class Part:
-        sn = 0
-        voltage = 0
-        pass_ = chr(0)
-        sr = chr(0)
-        resval = 0
-        design = chr(0)
-        process = chr(0)
-
-        def __init__(self):
-            self.processname = ctypes.create_string_buffer(MAXNAME)
-            self.designname = ctypes.create_string_buffer(MAXNAME)
-            self.failtype = Type()
 
     part = [Part() for _ in range(MAXPARTS)]
 
