@@ -74,7 +74,7 @@ class Part:
         part = cls()
         part._read_voltage(inline)
         part._read_sn(inline)
-        part._read_extra(inline, statfile)
+        part._read_failcode(inline, statfile)
         part._read_938(inline)
         part._read_fail(inline)
         return part
@@ -130,17 +130,11 @@ class Part:
             self.processname = "P Process"
             self.process = 'P'
 
-    def _read_extra(self, inline, statfile):
-        tempstring = []
+    def _read_failcode(self, inline, statfile):
         if textfind(inline, "   ****") == EOF:
             return
         self.pass_ = 'N'
-        count = 0
-        while count < 3:
-            tempstring[count:count + 1] = inline[count + 3]
-            count += 1
-        tempstring[count:count + 1] = '\x00'
-        failcode = atoi(tempstring)
+        failcode = int(inline[3:6])
         if failcode == 860 or failcode == 881:
             self.failtype.icc += 1
         elif failcode == 790 or failcode == 813:
