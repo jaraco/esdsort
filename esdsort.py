@@ -72,8 +72,6 @@ class Part:
 
 def main(argv):
 
-    part = [Part() for _ in range(MAXPARTS)]
-
     propage = ''
     despage = ''
 
@@ -94,7 +92,8 @@ def main(argv):
     print(banner)
     truncate(OUTPUT_FILENAME)
 
-    part_count = count_parts(argv, part)
+    part = count_parts(argv)
+    part_count = len(part)
 
     if part_count <= 0:
         return
@@ -504,9 +503,10 @@ def main(argv):
     resultfile.close()
 
 
-def count_parts(argv, part):
+def count_parts(argv):
     tempstring = []
     part_count = 0
+    part = [Part() for _ in range(MAXPARTS)]
 
     if len(argv) == 1:
         print(
@@ -660,7 +660,9 @@ def count_parts(argv, part):
         print("Sorting successful!\n")
         infile.close()
         statfile.close()
-    return part_count
+
+    del part[part_count + 1:]
+    return part
 
 
 def filecopy(infile):
