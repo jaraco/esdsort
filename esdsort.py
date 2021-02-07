@@ -173,15 +173,9 @@ class Part:
             print("Error!!!  Undefined fail code %d." % failcode)
 
     def _read_938(self, inline):
-        tempstring = []
-        if textfind(inline, "938") != 4:
+        if self.failcode != 938:
             return
-        count = 0
-        while count < 3:
-            tempstring[count:count + 1] = inline[14 + count]
-            count += 1
-        tempstring[count:count + 1] = '\x00'
-        self.resval = atoi(tempstring)
+        self.resval = int(inline[14:17])
         if res2des(self.resval) is not None:
             self.designname = \
                 res2des(self.resval)
