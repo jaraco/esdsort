@@ -227,8 +227,6 @@ def main(argv):
     try:
         resultfile = open("results.fails", "w")
     except Exception:
-        resultfile = None
-    if resultfile is None:
         print(
             "\nCannot open output file as %s." % "results.fails",
             file=sys.stderr,
