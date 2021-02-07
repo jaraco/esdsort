@@ -70,7 +70,7 @@ class Part:
         self.failtype = Type()
 
 
-def main(argc, argv):
+def main(argv):
 
     part = [Part() for _ in range(MAXPARTS)]
 
@@ -96,13 +96,13 @@ def main(argc, argv):
     print(banner)
     truncate(OUTPUT_FILENAME)
 
-    if argc == 1:
+    if len(argv) == 1:
         print(
             "Please re-enter command line with the name "
             "of the file to be sorted.",
             file=sys.stderr)
     else:
-        part_count = count_parts(argc, argv, part, part_count, tempstring)
+        part_count = count_parts(argv, part, part_count, tempstring)
 
     if part_count <= 0:
         return
@@ -512,12 +512,11 @@ def main(argc, argv):
     resultfile.close()
 
 
-def count_parts(argc, argv, part, part_count, tempstring):
+def count_parts(argv, part, part_count, tempstring):
     while True:
-        argc -= 1
-        if argc == 0:
-            break
         argv = argv[1:]
+        if not argv:
+            break
         try:
             infile = open(argv[0])
         except Exception:
@@ -806,4 +805,4 @@ def truncate(filename):
 
 
 if __name__ == '__main__':
-    main(len(sys.argv), sys.argv)
+    main(sys.argv)
