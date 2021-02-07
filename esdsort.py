@@ -82,122 +82,126 @@ class Part:
     def _read_voltage(self, inline):
         tempstring = []
         position = textfind(inline, "@")
-        if position != EOF:
-            position += 1
-            count = 0
-            while inline[position + count] != ' ':
-                tempstring[count:count + 1] = inline[position + count]
-                count += 1
-            tempstring[count:count + 1] = '\x00'
-            self.voltage = atoi(tempstring)
-            if tempstring[1].upper() == 'K':
-                self.voltage = self.voltage * 1000
+        if position == EOF:
+            return
+        position += 1
+        count = 0
+        while inline[position + count] != ' ':
+            tempstring[count:count + 1] = inline[position + count]
+            count += 1
+        tempstring[count:count + 1] = '\x00'
+        self.voltage = atoi(tempstring)
+        if tempstring[1].upper() == 'K':
+            self.voltage = self.voltage * 1000
 
     def _read_sn(self, inline):
         tempstring = []
         position = textfind(inline, "S/N")
-        if position != EOF:
-            position = position + 6
-            self.sr = 'N'
-            self.failtype.icc = \
-                self.failtype.ipd = \
-                self.failtype.inph = \
-                self.failtype.inpl = \
-                self.failtype.iodh = \
-                self.failtype.iodl = \
-                self.failtype.iozh = \
-                self.failtype.iozl = \
-                self.failtype.odh = \
-                self.failtype.odl = \
-                self.failtype.ozh = \
-                self.failtype.ozl = \
-                self.failtype.cont = 0
-            self.pass_ = 'Y'
+        if position == EOF:
+            return
+        position = position + 6
+        self.sr = 'N'
+        self.failtype.icc = \
+            self.failtype.ipd = \
+            self.failtype.inph = \
+            self.failtype.inpl = \
+            self.failtype.iodh = \
+            self.failtype.iodl = \
+            self.failtype.iozh = \
+            self.failtype.iozl = \
+            self.failtype.odh = \
+            self.failtype.odl = \
+            self.failtype.ozh = \
+            self.failtype.ozl = \
+            self.failtype.cont = 0
+        self.pass_ = 'Y'
 
-            if inline[position] == ' ':
-                if inline[position + 1] == ' ':
-                    position = position + 2
-                else:
-                    position = position + 1
-
-            count = 0
-            while count < 4:
-                tempstring[count:count + 1] = inline[position + count]
-                count += 1
-
-            tempstring[count:count + 1] = '\x00'
-            self.sn = atoi(tempstring)
-            if ser2pro(self.sn) is not None:
-                self.processname = \
-                    ser2pro(self.sn)
-                self.process = self.processname[0]
+        if inline[position] == ' ':
+            if inline[position + 1] == ' ':
+                position = position + 2
             else:
-                self.processname = "P Process"
-                self.process = 'P'
+                position = position + 1
+
+        count = 0
+        while count < 4:
+            tempstring[count:count + 1] = inline[position + count]
+            count += 1
+
+        tempstring[count:count + 1] = '\x00'
+        self.sn = atoi(tempstring)
+        if ser2pro(self.sn) is not None:
+            self.processname = \
+                ser2pro(self.sn)
+            self.process = self.processname[0]
+        else:
+            self.processname = "P Process"
+            self.process = 'P'
 
     def _read_extra(self, inline, statfile):
         tempstring = []
-        if textfind(inline, "   ****") != EOF:
-            self.pass_ = 'N'
-            count = 0
-            while count < 3:
-                tempstring[count:count + 1] = inline[count + 3]
-                count += 1
-            tempstring[count:count + 1] = '\x00'
-            failcode = atoi(tempstring)
-            if failcode == 860 or failcode == 881:
-                self.failtype.icc += 1
-            elif failcode == 790 or failcode == 813:
-                self.failtype.ipd += 1
-            elif failcode == 524:
-                self.failtype.inph += 1
-            elif failcode == 544:
-                self.failtype.inpl += 1
-            elif failcode == 615:
-                self.failtype.iodh += 1
-            elif failcode == 634:
-                self.failtype.iodl += 1
-            elif failcode == 574:
-                self.failtype.iozh += 1
-            elif failcode == 593:
-                self.failtype.iozl += 1
-            elif failcode == 697:
-                self.failtype.odh += 1
-            elif failcode == 716:
-                self.failtype.odl += 1
-            elif failcode == 656:
-                self.failtype.ozh += 1
-            elif failcode == 675:
-                self.failtype.ozl += 1
-            elif failcode == 315:
-                self.failtype.cont += 1
-            elif failcode == 938:
-                print("Identity fail.  Check status file", OUTPUT_FILENAME)
-                print(
-                    "Identity fail on sn%d" % self.sn,
-                    file=statfile)
-                print(
-                    "Zapped at %d volts\n" % self.voltage,
-                    file=statfile)
-            else:
-                print("Error!!!  Undefined fail code %d." % failcode)
+        if textfind(inline, "   ****") == EOF:
+            return
+        self.pass_ = 'N'
+        count = 0
+        while count < 3:
+            tempstring[count:count + 1] = inline[count + 3]
+            count += 1
+        tempstring[count:count + 1] = '\x00'
+        failcode = atoi(tempstring)
+        if failcode == 860 or failcode == 881:
+            self.failtype.icc += 1
+        elif failcode == 790 or failcode == 813:
+            self.failtype.ipd += 1
+        elif failcode == 524:
+            self.failtype.inph += 1
+        elif failcode == 544:
+            self.failtype.inpl += 1
+        elif failcode == 615:
+            self.failtype.iodh += 1
+        elif failcode == 634:
+            self.failtype.iodl += 1
+        elif failcode == 574:
+            self.failtype.iozh += 1
+        elif failcode == 593:
+            self.failtype.iozl += 1
+        elif failcode == 697:
+            self.failtype.odh += 1
+        elif failcode == 716:
+            self.failtype.odl += 1
+        elif failcode == 656:
+            self.failtype.ozh += 1
+        elif failcode == 675:
+            self.failtype.ozl += 1
+        elif failcode == 315:
+            self.failtype.cont += 1
+        elif failcode == 938:
+            print("Identity fail.  Check status file", OUTPUT_FILENAME)
+            print(
+                "Identity fail on sn%d" % self.sn,
+                file=statfile)
+            print(
+                "Zapped at %d volts\n" % self.voltage,
+                file=statfile)
+        else:
+            print("Error!!!  Undefined fail code %d." % failcode)
 
     def _read_938(self, inline):
         tempstring = []
-        if textfind(inline, "938") == 4:
-            count = 0
-            while count < 3:
-                tempstring[count:count + 1] = inline[14 + count]
-                count += 1
-            tempstring[count:count + 1] = '\x00'
-            self.resval = atoi(tempstring)
-            if res2des(self.resval) is not None:
-                self.designname = \
-                    res2des(self.resval)
-                self.design = self.designname[0]
-            else:
-                self.designname = "D Design"
-                self.design = 'D'
+        if textfind(inline, "938") != 4:
+            return
+        count = 0
+        while count < 3:
+            tempstring[count:count + 1] = inline[14 + count]
+            count += 1
+        tempstring[count:count + 1] = '\x00'
+        self.resval = atoi(tempstring)
+        if res2des(self.resval) is not None:
+            self.designname = \
+                res2des(self.resval)
+            self.design = self.designname[0]
+        else:
+            self.designname = "D Design"
+            self.design = 'D'
 
     def _read_fail(self, inline):
         if textfind(inline, "FAIL") == 20:
