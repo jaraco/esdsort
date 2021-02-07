@@ -78,7 +78,6 @@ def main(argc, argv):
     position = 0
     part_count = 0
     count = 0
-    failcode = 0
     i = 0
     e = 0
     save = 0
@@ -89,7 +88,7 @@ def main(argc, argv):
     fails = [None] * 30
 
     # files
-    infile = statfile = resultfile = None
+    resultfile = None
 
     print(banner)
     truncate(OUTPUT_FILENAME)
