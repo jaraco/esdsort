@@ -94,7 +94,6 @@ class Part:
         return base * multiplier
 
     def _read_sn(self, inline):
-        tempstring = []
         position = textfind(inline, "S/N")
         if position == EOF:
             return
@@ -121,13 +120,8 @@ class Part:
             else:
                 position = position + 1
 
-        count = 0
-        while count < 4:
-            tempstring[count:count + 1] = inline[position + count]
-            count += 1
+        self.sn = int(inline[position:position+4])
 
-        tempstring[count:count + 1] = '\x00'
-        self.sn = atoi(tempstring)
         if ser2pro(self.sn) is not None:
             self.processname = \
                 ser2pro(self.sn)
