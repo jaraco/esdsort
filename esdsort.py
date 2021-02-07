@@ -80,19 +80,18 @@ class Part:
         return part
 
     def _read_voltage(self, inline):
-        tempstring = []
         position = textfind(inline, "@")
         if position == EOF:
             return
-        position += 1
-        count = 0
-        while inline[position + count] != ' ':
-            tempstring[count:count + 1] = inline[position + count]
-            count += 1
-        tempstring[count:count + 1] = '\x00'
-        self.voltage = atoi(tempstring)
-        if tempstring[1].upper() == 'K':
-            self.voltage = self.voltage * 1000
+        val, _, _ = inline[position + 1].partition(' ')
+        self.voltage = self._parse_voltage(val)
+
+    @staticmethod
+    def _parse_voltage(val):
+        val = val.upper()
+        base = int(val.strip('K'))
+        multiplier = 1000 if val.endswith('K') else 1
+        return base * multiplier
 
     def _read_sn(self, inline):
         tempstring = []
