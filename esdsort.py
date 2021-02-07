@@ -201,9 +201,6 @@ def main(argv):
     count = 0
     i = 0
     e = 0
-    save = 0
-    paglen = 0
-    newdes = 0
     voltages = [None] * MAXVOLTAGES
     total = [None] * 30
     fails = [None] * 30
@@ -222,167 +219,7 @@ def main(argv):
 
     print("Total parts: %d" % part_count)
 
-    #              Make Result Files                   #
-
-    try:
-        resultfile = open("results.fails", "w")
-    except Exception:
-        print(
-            "\nCannot open output file as %s." % "results.fails",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
-    header = \
-        "SN     P  SR  ICC  IPD  INPH INPL IODH IODL IOZH IOZL ODH ODL OZH OZL CONT"
-    print("\nCreating result files.")
-    pagelen = save = 0
-
-    position = 1
-    while position <= part_count:
-        if part[position].voltage != part[save].voltage:
-            save = position
-            propage = 'A'
-
-        while propage < 'M':
-            despage = 'A'
-
-            for i in range(part_count):
-                if part[i].voltage == part[save].voltage and \
-                        part[i].process == propage:
-                    while despage < 'M':
-                        newdes = 'Y'
-                        for e in range(part_count):
-
-                            if paglen > 60 or pagelen == 0:
-                                print(
-                                    "%c\n%dV\n%s" %
-                                    (FF, part[save].voltage, header),
-                                    file=resultfile,
-                                )
-                                for count in range(76):
-                                    print('=', end='', file=resultfile)
-                                print(
-                                    "\n%s" % part[i].processname,
-                                    file=resultfile,
-                                )
-                                paglen = 6
-                            if (
-                                part[e].voltage == part[save].voltage and
-                                part[e].process == propage and
-                                part[e].design == despage
-                            ):
-                                if newdes == 'Y':
-                                    print(file=resultfile)
-                                    paglen += 1
-                                    newdes = 'N'
-                                pagelen += 1
-                            print(
-                                "%c %4d %c  %c" % (
-                                    part[e].design, part[e].sn,
-                                    part[e].pass_, part[e].sr,
-                                    ),
-                                end='',
-                                file=resultfile,
-                            )
-                            if part[e].failtype.icc > 0:
-                                print(
-                                    "   %d" % part[e].failtype.icc,
-                                    file=resultfile,
-                                    end='',
-                                )
-                            else:
-                                print("    ", file=resultfile, end='')
-                            if part[e].failtype.ipd > 0:
-                                print(
-                                    "    %d" % part[e].failtype.ipd,
-                                    file=resultfile,
-                                )
-                            else:
-                                print("     ", file=resultfile, end='')
-                            if part[e].failtype.inph > 0:
-                                print(
-                                    "    %d" % part[e].failtype.inph,
-                                    file=resultfile,
-                                )
-                            else:
-                                print("     ", file=resultfile, end='')
-                            if part[e].failtype.inpl > 0:
-                                print(
-                                    "    %d" % part[e].failtype.inpl,
-                                    file=resultfile,
-                                )
-                            else:
-                                print("     ", file=resultfile, end='')
-                            if part[e].failtype.iodh > 0:
-                                print(
-                                    "    %d" % part[e].failtype.iodh,
-                                    file=resultfile,
-                                )
-                            else:
-                                print("     ", file=resultfile, end='')
-                            if part[e].failtype.iodl > 0:
-                                print(
-                                    "    %d" % part[e].failtype.iodl,
-                                    file=resultfile,
-                                )
-                            else:
-                                print("     ", file=resultfile, end='')
-                            if part[e].failtype.iozh > 0:
-                                print(
-                                    "    %d" % part[e].failtype.iozh,
-                                    file=resultfile,
-                                )
-                            else:
-                                print("     ", file=resultfile, end='')
-                            if part[e].failtype.iozl > 0:
-                                print(
-                                    "    %d" % part[e].failtype.iozl,
-                                    file=resultfile,
-                                )
-                            else:
-                                print("     ", file=resultfile, end='')
-                            if part[e].failtype.odh > 0:
-                                print(
-                                    "    %d" % part[e].failtype.odh,
-                                    file=resultfile,
-                                )
-                            else:
-                                print("     ", file=resultfile, end='')
-                            if part[e].failtype.odl > 0:
-                                print(
-                                    "   %d" % part[e].failtype.odl,
-                                    file=resultfile,
-                                )
-                            else:
-                                print("    ", file=resultfile, end='')
-                            if part[e].failtype.ozh > 0:
-                                print(
-                                    "   %d" % part[e].failtype.ozh,
-                                    file=resultfile,
-                                )
-                            else:
-                                print("    ", file=resultfile, end='')
-                            if part[e].failtype.ozl > 0:
-                                print(
-                                    "   %d" % part[e].failtype.ozl,
-                                    file=resultfile,
-                                )
-                            else:
-                                print("    ", file=resultfile, end='')
-                            if part[e].failtype.cont > 0:
-                                print(
-                                    "     %d" % part[e].failtype.cont,
-                                    file=resultfile,
-                                )
-                            else:
-                                print("    \n", file=resultfile, end='')
-                        despage += 1
-
-            paglen = 0
-            propage += 1
-        position += 1
-    resultfile.close()
+    make_results(part)
 
     position = 1
     while position <= part_count:
@@ -619,6 +456,170 @@ def main(argv):
                     break
                 count += 1
             despage = chr(ord(despage) + 1)
+        position += 1
+    resultfile.close()
+
+
+def make_results(part):
+    """Make result files"""
+
+    pagelen = save = 0
+    try:
+        resultfile = open("results.fails", "w")
+    except Exception:
+        print(
+            "\nCannot open output file as %s." % "results.fails",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    header = \
+        "SN     P  SR  ICC  IPD  INPH INPL IODH IODL IOZH IOZL ODH ODL OZH OZL CONT"
+    print("\nCreating result files.")
+
+    position = 1
+    while position <= len(part):
+        if part[position].voltage != part[save].voltage:
+            save = position
+            propage = 'A'
+
+        while propage < 'M':
+            despage = 'A'
+
+            for i in range(len(part)):
+                if part[i].voltage == part[save].voltage and \
+                        part[i].process == propage:
+                    while despage < 'M':
+                        newdes = 'Y'
+                        for e in range(len(part)):
+
+                            if pagelen > 60 or pagelen == 0:
+                                print(
+                                    "%c\n%dV\n%s" %
+                                    (FF, part[save].voltage, header),
+                                    file=resultfile,
+                                )
+                                for count in range(76):
+                                    print('=', end='', file=resultfile)
+                                print(
+                                    "\n%s" % part[i].processname,
+                                    file=resultfile,
+                                )
+                                pagelen = 6
+                            if (
+                                part[e].voltage == part[save].voltage and
+                                part[e].process == propage and
+                                part[e].design == despage
+                            ):
+                                if newdes == 'Y':
+                                    print(file=resultfile)
+                                    pagelen += 1
+                                    newdes = 'N'
+                                pagelen += 1
+                            print(
+                                "%c %4d %c  %c" % (
+                                    part[e].design, part[e].sn,
+                                    part[e].pass_, part[e].sr,
+                                    ),
+                                end='',
+                                file=resultfile,
+                            )
+                            if part[e].failtype.icc > 0:
+                                print(
+                                    "   %d" % part[e].failtype.icc,
+                                    file=resultfile,
+                                    end='',
+                                )
+                            else:
+                                print("    ", file=resultfile, end='')
+                            if part[e].failtype.ipd > 0:
+                                print(
+                                    "    %d" % part[e].failtype.ipd,
+                                    file=resultfile,
+                                )
+                            else:
+                                print("     ", file=resultfile, end='')
+                            if part[e].failtype.inph > 0:
+                                print(
+                                    "    %d" % part[e].failtype.inph,
+                                    file=resultfile,
+                                )
+                            else:
+                                print("     ", file=resultfile, end='')
+                            if part[e].failtype.inpl > 0:
+                                print(
+                                    "    %d" % part[e].failtype.inpl,
+                                    file=resultfile,
+                                )
+                            else:
+                                print("     ", file=resultfile, end='')
+                            if part[e].failtype.iodh > 0:
+                                print(
+                                    "    %d" % part[e].failtype.iodh,
+                                    file=resultfile,
+                                )
+                            else:
+                                print("     ", file=resultfile, end='')
+                            if part[e].failtype.iodl > 0:
+                                print(
+                                    "    %d" % part[e].failtype.iodl,
+                                    file=resultfile,
+                                )
+                            else:
+                                print("     ", file=resultfile, end='')
+                            if part[e].failtype.iozh > 0:
+                                print(
+                                    "    %d" % part[e].failtype.iozh,
+                                    file=resultfile,
+                                )
+                            else:
+                                print("     ", file=resultfile, end='')
+                            if part[e].failtype.iozl > 0:
+                                print(
+                                    "    %d" % part[e].failtype.iozl,
+                                    file=resultfile,
+                                )
+                            else:
+                                print("     ", file=resultfile, end='')
+                            if part[e].failtype.odh > 0:
+                                print(
+                                    "    %d" % part[e].failtype.odh,
+                                    file=resultfile,
+                                )
+                            else:
+                                print("     ", file=resultfile, end='')
+                            if part[e].failtype.odl > 0:
+                                print(
+                                    "   %d" % part[e].failtype.odl,
+                                    file=resultfile,
+                                )
+                            else:
+                                print("    ", file=resultfile, end='')
+                            if part[e].failtype.ozh > 0:
+                                print(
+                                    "   %d" % part[e].failtype.ozh,
+                                    file=resultfile,
+                                )
+                            else:
+                                print("    ", file=resultfile, end='')
+                            if part[e].failtype.ozl > 0:
+                                print(
+                                    "   %d" % part[e].failtype.ozl,
+                                    file=resultfile,
+                                )
+                            else:
+                                print("    ", file=resultfile, end='')
+                            if part[e].failtype.cont > 0:
+                                print(
+                                    "     %d" % part[e].failtype.cont,
+                                    file=resultfile,
+                                )
+                            else:
+                                print("    \n", file=resultfile, end='')
+                        despage += 1
+
+            pagelen = 0
+            propage += 1
         position += 1
     resultfile.close()
 
