@@ -72,8 +72,15 @@ class Part:
     @classmethod
     def from_line(cls, inline, statfile):
         part = cls()
-        tempstring = []
+        part._read_voltage(inline)
+        part._read_sn(inline)
+        part._read_extra(inline, statfile)
+        part._read_938(inline)
+        part._read_fail(inline)
+        return part
 
+    def _read_voltage(self, inline):
+        tempstring = []
         position = textfind(inline, "@")
         if position != EOF:
             position += 1
@@ -82,28 +89,30 @@ class Part:
                 tempstring[count:count + 1] = inline[position + count]
                 count += 1
             tempstring[count:count + 1] = '\x00'
-            part.voltage = atoi(tempstring)
+            self.voltage = atoi(tempstring)
             if tempstring[1].upper() == 'K':
-                part.voltage = part.voltage * 1000
+                self.voltage = self.voltage * 1000
 
+    def _read_sn(self, inline):
+        tempstring = []
         position = textfind(inline, "S/N")
         if position != EOF:
             position = position + 6
-            part.sr = 'N'
-            part.failtype.icc = \
-                part.failtype.ipd = \
-                part.failtype.inph = \
-                part.failtype.inpl = \
-                part.failtype.iodh = \
-                part.failtype.iodl = \
-                part.failtype.iozh = \
-                part.failtype.iozl = \
-                part.failtype.odh = \
-                part.failtype.odl = \
-                part.failtype.ozh = \
-                part.failtype.ozl = \
-                part.failtype.cont = 0
-            part.pass_ = 'Y'
+            self.sr = 'N'
+            self.failtype.icc = \
+                self.failtype.ipd = \
+                self.failtype.inph = \
+                self.failtype.inpl = \
+                self.failtype.iodh = \
+                self.failtype.iodl = \
+                self.failtype.iozh = \
+                self.failtype.iozl = \
+                self.failtype.odh = \
+                self.failtype.odl = \
+                self.failtype.ozh = \
+                self.failtype.ozl = \
+                self.failtype.cont = 0
+            self.pass_ = 'Y'
 
             if inline[position] == ' ':
                 if inline[position + 1] == ' ':
@@ -117,17 +126,19 @@ class Part:
                 count += 1
 
             tempstring[count:count + 1] = '\x00'
-            part.sn = atoi(tempstring)
-            if ser2pro(part.sn) is not None:
-                part.processname = \
-                    ser2pro(part.sn)
-                part.process = part.processname[0]
+            self.sn = atoi(tempstring)
+            if ser2pro(self.sn) is not None:
+                self.processname = \
+                    ser2pro(self.sn)
+                self.process = self.processname[0]
             else:
-                part.processname = "P Process"
-                part.process = 'P'
+                self.processname = "P Process"
+                self.process = 'P'
 
+    def _read_extra(self, inline, statfile):
+        tempstring = []
         if textfind(inline, "   ****") != EOF:
-            part.pass_ = 'N'
+            self.pass_ = 'N'
             count = 0
             while count < 3:
                 tempstring[count:count + 1] = inline[count + 3]
@@ -135,62 +146,65 @@ class Part:
             tempstring[count:count + 1] = '\x00'
             failcode = atoi(tempstring)
             if failcode == 860 or failcode == 881:
-                part.failtype.icc += 1
+                self.failtype.icc += 1
             elif failcode == 790 or failcode == 813:
-                part.failtype.ipd += 1
+                self.failtype.ipd += 1
             elif failcode == 524:
-                part.failtype.inph += 1
+                self.failtype.inph += 1
             elif failcode == 544:
-                part.failtype.inpl += 1
+                self.failtype.inpl += 1
             elif failcode == 615:
-                part.failtype.iodh += 1
+                self.failtype.iodh += 1
             elif failcode == 634:
-                part.failtype.iodl += 1
+                self.failtype.iodl += 1
             elif failcode == 574:
-                part.failtype.iozh += 1
+                self.failtype.iozh += 1
             elif failcode == 593:
-                part.failtype.iozl += 1
+                self.failtype.iozl += 1
             elif failcode == 697:
-                part.failtype.odh += 1
+                self.failtype.odh += 1
             elif failcode == 716:
-                part.failtype.odl += 1
+                self.failtype.odl += 1
             elif failcode == 656:
-                part.failtype.ozh += 1
+                self.failtype.ozh += 1
             elif failcode == 675:
-                part.failtype.ozl += 1
+                self.failtype.ozl += 1
             elif failcode == 315:
-                part.failtype.cont += 1
+                self.failtype.cont += 1
             elif failcode == 938:
                 print("Identity fail.  Check status file", OUTPUT_FILENAME)
                 print(
-                    "Identity fail on sn%d" % part.sn,
+                    "Identity fail on sn%d" % self.sn,
                     file=statfile)
                 print(
-                    "Zapped at %d volts\n" % part.voltage,
+                    "Zapped at %d volts\n" % self.voltage,
                     file=statfile)
             else:
                 print("Error!!!  Undefined fail code %d." % failcode)
 
+    def _read_938(self, inline):
+        tempstring = []
         if textfind(inline, "938") == 4:
             count = 0
             while count < 3:
                 tempstring[count:count + 1] = inline[14 + count]
                 count += 1
             tempstring[count:count + 1] = '\x00'
-            part.resval = atoi(tempstring)
-            if res2des(part.resval) is not None:
-                part.designname = \
-                    res2des(part.resval)
-                part.design = part.designname[0]
+            self.resval = atoi(tempstring)
+            if res2des(self.resval) is not None:
+                self.designname = \
+                    res2des(self.resval)
+                self.design = self.designname[0]
             else:
-                part.designname = "D Design"
-                part.design = 'D'
+                self.designname = "D Design"
+                self.design = 'D'
 
+    def _read_fail(self, inline):
         if textfind(inline, "FAIL") == 20:
-            part.pass_ = 'N'
-            part.sr = 'Y'
+            self.pass_ = 'N'
+            self.sr = 'Y'
         else:
-            part.sr = 'N'
+            self.sr = 'N'
 
 
 def main(argv):
