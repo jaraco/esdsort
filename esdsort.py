@@ -116,157 +116,157 @@ def main(argc, argv):
                 file=sys.stderr,
             )
             sys.exit(1)
-        else:
-            header = \
-                "SN     P  SR  ICC  IPD  INPH INPL IODH IODL IOZH IOZL ODH ODL OZH OZL CONT"
-            print("\nCreating result files.")
-            pagelen = save = 0
 
-            position = 1
-            while position <= part_count:
-                if part[position].voltage != part[save].voltage:
-                    save = position
-                    propage = 'A'
+        header = \
+            "SN     P  SR  ICC  IPD  INPH INPL IODH IODL IOZH IOZL ODH ODL OZH OZL CONT"
+        print("\nCreating result files.")
+        pagelen = save = 0
 
-                while propage < 'M':
-                    despage = 'A'
+        position = 1
+        while position <= part_count:
+            if part[position].voltage != part[save].voltage:
+                save = position
+                propage = 'A'
 
-                    for i in range(part_count):
-                        if part[i].voltage == part[save].voltage and \
-                                part[i].process == propage:
-                            while despage < 'M':
-                                newdes = 'Y'
-                                for e in range(part_count):
+            while propage < 'M':
+                despage = 'A'
 
-                                    if paglen > 60 or pagelen == 0:
-                                        print(
-                                            "%c\n%dV\n%s" %
-                                            (FF, part[save].voltage, header),
-                                            file=resultfile,
-                                        )
-                                        for count in range(76):
-                                            print('=', end='', file=resultfile)
-                                        print(
-                                            "\n%s" % part[i].processname,
-                                            file=resultfile,
-                                        )
-                                        paglen = 6
-                                    if (
-                                        part[e].voltage == part[save].voltage and
-                                        part[e].process == propage and
-                                        part[e].design == despage
-                                    ):
-                                        if newdes == 'Y':
-                                            print(file=resultfile)
-                                            paglen += 1
-                                            newdes = 'N'
-                                        pagelen += 1
+                for i in range(part_count):
+                    if part[i].voltage == part[save].voltage and \
+                            part[i].process == propage:
+                        while despage < 'M':
+                            newdes = 'Y'
+                            for e in range(part_count):
+
+                                if paglen > 60 or pagelen == 0:
                                     print(
-                                        "%c %4d %c  %c" % (
-                                            part[e].design, part[e].sn,
-                                            part[e].pass_, part[e].sr,
-                                            ),
-                                        end='',
+                                        "%c\n%dV\n%s" %
+                                        (FF, part[save].voltage, header),
                                         file=resultfile,
                                     )
-                                    if part[e].failtype.icc > 0:
-                                        print(
-                                            "   %d" % part[e].failtype.icc,
-                                            file=resultfile,
-                                            end='',
-                                        )
-                                    else:
-                                        print("    ", file=resultfile, end='')
-                                    if part[e].failtype.ipd > 0:
-                                        print(
-                                            "    %d" % part[e].failtype.ipd,
-                                            file=resultfile,
-                                        )
-                                    else:
-                                        print("     ", file=resultfile, end='')
-                                    if part[e].failtype.inph > 0:
-                                        print(
-                                            "    %d" % part[e].failtype.inph,
-                                            file=resultfile,
-                                        )
-                                    else:
-                                        print("     ", file=resultfile, end='')
-                                    if part[e].failtype.inpl > 0:
-                                        print(
-                                            "    %d" % part[e].failtype.inpl,
-                                            file=resultfile,
-                                        )
-                                    else:
-                                        print("     ", file=resultfile, end='')
-                                    if part[e].failtype.iodh > 0:
-                                        print(
-                                            "    %d" % part[e].failtype.iodh,
-                                            file=resultfile,
-                                        )
-                                    else:
-                                        print("     ", file=resultfile, end='')
-                                    if part[e].failtype.iodl > 0:
-                                        print(
-                                            "    %d" % part[e].failtype.iodl,
-                                            file=resultfile,
-                                        )
-                                    else:
-                                        print("     ", file=resultfile, end='')
-                                    if part[e].failtype.iozh > 0:
-                                        print(
-                                            "    %d" % part[e].failtype.iozh,
-                                            file=resultfile,
-                                        )
-                                    else:
-                                        print("     ", file=resultfile, end='')
-                                    if part[e].failtype.iozl > 0:
-                                        print(
-                                            "    %d" % part[e].failtype.iozl,
-                                            file=resultfile,
-                                        )
-                                    else:
-                                        print("     ", file=resultfile, end='')
-                                    if part[e].failtype.odh > 0:
-                                        print(
-                                            "    %d" % part[e].failtype.odh,
-                                            file=resultfile,
-                                        )
-                                    else:
-                                        print("     ", file=resultfile, end='')
-                                    if part[e].failtype.odl > 0:
-                                        print(
-                                            "   %d" % part[e].failtype.odl,
-                                            file=resultfile,
-                                        )
-                                    else:
-                                        print("    ", file=resultfile, end='')
-                                    if part[e].failtype.ozh > 0:
-                                        print(
-                                            "   %d" % part[e].failtype.ozh,
-                                            file=resultfile,
-                                        )
-                                    else:
-                                        print("    ", file=resultfile, end='')
-                                    if part[e].failtype.ozl > 0:
-                                        print(
-                                            "   %d" % part[e].failtype.ozl,
-                                            file=resultfile,
-                                        )
-                                    else:
-                                        print("    ", file=resultfile, end='')
-                                    if part[e].failtype.cont > 0:
-                                        print(
-                                            "     %d" % part[e].failtype.cont,
-                                            file=resultfile,
-                                        )
-                                    else:
-                                        print("    \n", file=resultfile, end='')
-                                despage += 1
+                                    for count in range(76):
+                                        print('=', end='', file=resultfile)
+                                    print(
+                                        "\n%s" % part[i].processname,
+                                        file=resultfile,
+                                    )
+                                    paglen = 6
+                                if (
+                                    part[e].voltage == part[save].voltage and
+                                    part[e].process == propage and
+                                    part[e].design == despage
+                                ):
+                                    if newdes == 'Y':
+                                        print(file=resultfile)
+                                        paglen += 1
+                                        newdes = 'N'
+                                    pagelen += 1
+                                print(
+                                    "%c %4d %c  %c" % (
+                                        part[e].design, part[e].sn,
+                                        part[e].pass_, part[e].sr,
+                                        ),
+                                    end='',
+                                    file=resultfile,
+                                )
+                                if part[e].failtype.icc > 0:
+                                    print(
+                                        "   %d" % part[e].failtype.icc,
+                                        file=resultfile,
+                                        end='',
+                                    )
+                                else:
+                                    print("    ", file=resultfile, end='')
+                                if part[e].failtype.ipd > 0:
+                                    print(
+                                        "    %d" % part[e].failtype.ipd,
+                                        file=resultfile,
+                                    )
+                                else:
+                                    print("     ", file=resultfile, end='')
+                                if part[e].failtype.inph > 0:
+                                    print(
+                                        "    %d" % part[e].failtype.inph,
+                                        file=resultfile,
+                                    )
+                                else:
+                                    print("     ", file=resultfile, end='')
+                                if part[e].failtype.inpl > 0:
+                                    print(
+                                        "    %d" % part[e].failtype.inpl,
+                                        file=resultfile,
+                                    )
+                                else:
+                                    print("     ", file=resultfile, end='')
+                                if part[e].failtype.iodh > 0:
+                                    print(
+                                        "    %d" % part[e].failtype.iodh,
+                                        file=resultfile,
+                                    )
+                                else:
+                                    print("     ", file=resultfile, end='')
+                                if part[e].failtype.iodl > 0:
+                                    print(
+                                        "    %d" % part[e].failtype.iodl,
+                                        file=resultfile,
+                                    )
+                                else:
+                                    print("     ", file=resultfile, end='')
+                                if part[e].failtype.iozh > 0:
+                                    print(
+                                        "    %d" % part[e].failtype.iozh,
+                                        file=resultfile,
+                                    )
+                                else:
+                                    print("     ", file=resultfile, end='')
+                                if part[e].failtype.iozl > 0:
+                                    print(
+                                        "    %d" % part[e].failtype.iozl,
+                                        file=resultfile,
+                                    )
+                                else:
+                                    print("     ", file=resultfile, end='')
+                                if part[e].failtype.odh > 0:
+                                    print(
+                                        "    %d" % part[e].failtype.odh,
+                                        file=resultfile,
+                                    )
+                                else:
+                                    print("     ", file=resultfile, end='')
+                                if part[e].failtype.odl > 0:
+                                    print(
+                                        "   %d" % part[e].failtype.odl,
+                                        file=resultfile,
+                                    )
+                                else:
+                                    print("    ", file=resultfile, end='')
+                                if part[e].failtype.ozh > 0:
+                                    print(
+                                        "   %d" % part[e].failtype.ozh,
+                                        file=resultfile,
+                                    )
+                                else:
+                                    print("    ", file=resultfile, end='')
+                                if part[e].failtype.ozl > 0:
+                                    print(
+                                        "   %d" % part[e].failtype.ozl,
+                                        file=resultfile,
+                                    )
+                                else:
+                                    print("    ", file=resultfile, end='')
+                                if part[e].failtype.cont > 0:
+                                    print(
+                                        "     %d" % part[e].failtype.cont,
+                                        file=resultfile,
+                                    )
+                                else:
+                                    print("    \n", file=resultfile, end='')
+                            despage += 1
 
-                    paglen = 0
-                    propage += 1
-                position += 1
-            resultfile.close()
+                paglen = 0
+                propage += 1
+            position += 1
+        resultfile.close()
 
         position = 1
         while position <= part_count:
@@ -289,86 +289,86 @@ def main(argc, argv):
                 end='',
             )
             sys.exit(1)
-        else:
-            propage = 'A'
-            while propage < 'M':
-                paglen = 0
-                despage = 'A'
-                while despage < 'M':
-                    count = 1
-                    while count <= part_count:
+
+        propage = 'A'
+        while propage < 'M':
+            paglen = 0
+            despage = 'A'
+            while despage < 'M':
+                count = 1
+                while count <= part_count:
+                    position = 0
+                    while voltages[position] != 0:
+                        total[position] = fails[position] = 0
+                        if (
+                            part[count].process == propage
+                            and part[count].design == despage
+                        ):
+                            if paglen == 0 or paglen > 60:
+                                paglen = 6
+                                print(
+                                    "%c\nPROCESS %s\n           DESIGN    " %
+                                    (FF, part[count].processname),
+                                    file=resultfile,
+                                    end='',
+                                )
+                                i = 0
+                                while voltages[i] != 0:
+                                    print(
+                                        "%3.1fKV  " % voltages[i]/1000,
+                                        file=resultfile,
+                                        end='',
+                                    )
+                                    i += 1
+                                print(file=resultfile)
+                                for i in range(76):
+                                    print('=', file=resultfile, end='')
+                                print("\n", file=resultfile)
+
+                            e = 1
+                            while e < part_count:
+                                if (
+                                    part[e].process == propage
+                                    and part[e].design == despage
+                                    and part[e].voltage == voltages[position]
+                                ):
+                                    total[position] += 1
+                                    if part[e].pass_ == 'N':
+                                        fails[position] += 1
+                                e += 1
+                        position += 1
+                    if (
+                        part[count].design == despage
+                        and part[count].process == propage
+                    ):
+
+                        print(
+                            "%17s    " % part[count].designname,
+                            file=resultfile,
+                            end='',
+                        )
                         position = 0
                         while voltages[position] != 0:
-                            total[position] = fails[position] = 0
-                            if (
-                                part[count].process == propage
-                                and part[count].design == despage
-                            ):
-                                if paglen == 0 or paglen > 60:
-                                    paglen = 6
-                                    print(
-                                        "%c\nPROCESS %s\n           DESIGN    " %
-                                        (FF, part[count].processname),
-                                        file=resultfile,
-                                        end='',
-                                    )
-                                    i = 0
-                                    while voltages[i] != 0:
-                                        print(
-                                            "%3.1fKV  " % voltages[i]/1000,
-                                            file=resultfile,
-                                            end='',
-                                        )
-                                        i += 1
-                                    print(file=resultfile)
-                                    for i in range(76):
-                                        print('=', file=resultfile, end='')
-                                    print("\n", file=resultfile)
-
-                                e = 1
-                                while e < part_count:
-                                    if (
-                                        part[e].process == propage
-                                        and part[e].design == despage
-                                        and part[e].voltage == voltages[position]
-                                    ):
-                                        total[position] += 1
-                                        if part[e].pass_ == 'N':
-                                            fails[position] += 1
-                                    e += 1
+                            if total[position] != 0:
+                                print(
+                                    "%2d/%2d  " %
+                                    (fails[position], total[position]),
+                                    file=resultfile,
+                                    end='',
+                                )
+                            else:
+                                print("       ", file=resultfile, end='')
                             position += 1
-                        if (
-                            part[count].design == despage
-                            and part[count].process == propage
-                        ):
-
-                            print(
-                                "%17s    " % part[count].designname,
-                                file=resultfile,
-                                end='',
-                            )
-                            position = 0
-                            while voltages[position] != 0:
-                                if total[position] != 0:
-                                    print(
-                                        "%2d/%2d  " %
-                                        (fails[position], total[position]),
-                                        file=resultfile,
-                                        end='',
-                                    )
-                                else:
-                                    print("       ", file=resultfile, end='')
-                                position += 1
-                            print(file=resultfile)
-                            for i in range(76):
-                                print("_", file=resultfile, end='')
-                            print("\n", file=resultfile)
-                            paglen = paglen + 3
-                            break
-                        count += 1
-                    despage = chr(ord(despage) + 1)
-                propage = chr(ord(propage) + 1)
-            resultfile.close()
+                        print(file=resultfile)
+                        for i in range(76):
+                            print("_", file=resultfile, end='')
+                        print("\n", file=resultfile)
+                        paglen = paglen + 3
+                        break
+                    count += 1
+                despage = chr(ord(despage) + 1)
+            propage = chr(ord(propage) + 1)
+        resultfile.close()
 
         try:
             resultfile = open("results.volt", "w")
@@ -382,129 +382,129 @@ def main(argc, argv):
                 end='',
             )
             sys.exit(1)
-        else:
-            position = 0
-            while voltages[position] != 0:
-                paglen = 0
-                despage = 'A'
-                while despage < 'M':
-                    count = 1
-                    while count <= part_count:
-                        propage = 'A'
-                        while propage < 'M':
-                            total[propage - ord('A')] = fails[propage - ord('A')] = 0
-                            if (
-                                part[count].voltage == voltages[position]
-                                and part[count].design == despage
-                            ):
-                                if paglen == 0 or paglen > 60:
-                                    paglen = 6
 
-                                    print(
-                                        "%c\nVOLTAGE %4d\t\t\tPROCESS\n           DESIGN   " %
-                                        (FF, voltages[position]),
-                                        file=resultfile,
-                                        end='',
-                                    )
-                                    i = 'A'
-                                    while i < 'M':
-                                        if i == 'L':
-                                            print(
-                                                i,
-                                                file=resultfile,
-                                                end='',
-                                            )
-                                        else:
-                                            print(
-                                                "%c       " % i,
-                                                file=resultfile,
-                                                end='',
-                                            )
-                                        i = chr(ord(i) + 2)
-                                    print(
-                                        "\n                 ",
-                                        file=resultfile,
-                                        end='',
-                                    )
-                                    i = 'B'
-                                    while i < 'N':
+        position = 0
+        while voltages[position] != 0:
+            paglen = 0
+            despage = 'A'
+            while despage < 'M':
+                count = 1
+                while count <= part_count:
+                    propage = 'A'
+                    while propage < 'M':
+                        total[propage - ord('A')] = fails[propage - ord('A')] = 0
+                        if (
+                            part[count].voltage == voltages[position]
+                            and part[count].design == despage
+                        ):
+                            if paglen == 0 or paglen > 60:
+                                paglen = 6
+
+                                print(
+                                    "%c\nVOLTAGE %4d\t\t\tPROCESS\n           DESIGN   " %
+                                    (FF, voltages[position]),
+                                    file=resultfile,
+                                    end='',
+                                )
+                                i = 'A'
+                                while i < 'M':
+                                    if i == 'L':
                                         print(
-                                            "       %c" % i,
+                                            i,
                                             file=resultfile,
                                             end='',
                                         )
-                                        i = chr(ord(i) + 2)
-                                    print(file=resultfile)
-                                    for i in range(76):
-                                        print("=", file=resultfile, end="")
-                                    print("\n", file=resultfile)
-
-                                e = 1
-                                while e <= part_count:
-                                    if (
-                                        part[e].process == propage
-                                        and part[e].design == despage
-                                        and part[e].voltage == voltages[position]
-                                    ):
-                                        total[propage-ord('A')] += 1
-                                        if part[e].pass_ == 'N':
-                                            fails[propage-ord('A')] += 1
-                                    e += 1
-                            propage = chr(ord(propage) + 1)
-                        if (
-                            part[count].design == despage
-                            and part[count].voltage == voltages[position]
-                        ):
-
-                            print(
-                                "%17s   " % part[count].designname,
-                                file=resultfile,
-                                end='',
-                            )
-                            propage = 'A'
-                            while propage < 'M':
-                                if total[propage-ord('A')] != 0:
+                                    else:
+                                        print(
+                                            "%c       " % i,
+                                            file=resultfile,
+                                            end='',
+                                        )
+                                    i = chr(ord(i) + 2)
+                                print(
+                                    "\n                 ",
+                                    file=resultfile,
+                                    end='',
+                                )
+                                i = 'B'
+                                while i < 'N':
                                     print(
-                                        "%2d/%2d   " % (
-                                            fails[propage-ord('A')],
-                                            total[propage-ord('A')],
-                                        ),
+                                        "       %c" % i,
                                         file=resultfile,
                                         end='',
                                     )
-                                else:
-                                    print("        ", file=resultfile, end='')
-                                propage = chr(ord(propage) + 2)
+                                    i = chr(ord(i) + 2)
+                                print(file=resultfile)
+                                for i in range(76):
+                                    print("=", file=resultfile, end="")
+                                print("\n", file=resultfile)
 
-                            print(
-                                "\n                        ",
-                                file=resultfile,
-                                end="",
-                            )
-                            propage = 'B'
-                            while propage < 'N':
-                                if total[propage-ord('A')] != 0:
-                                    print(
-                                        "%2d/%2d   " % (
-                                            fails[propage-ord('A')],
-                                            total[propage-ord('A')],
-                                        ),
-                                        file=resultfile,
-                                        end='',
-                                    )
-                                else:
-                                    print("        ", file=resultfile, end="")
-                                propage = chr(ord(propage) + 2)
-                            print(file=resultfile)
-                            for i in range(76):
-                                print("_", file=resultfile, end="")
-                            print("\n", file=resultfile)
-                            paglen = paglen + 3
-                            break
-                        count += 1
-                    despage = chr(ord(despage) + 1)
-                position += 1
-            resultfile.close()
+                            e = 1
+                            while e <= part_count:
+                                if (
+                                    part[e].process == propage
+                                    and part[e].design == despage
+                                    and part[e].voltage == voltages[position]
+                                ):
+                                    total[propage-ord('A')] += 1
+                                    if part[e].pass_ == 'N':
+                                        fails[propage-ord('A')] += 1
+                                e += 1
+                        propage = chr(ord(propage) + 1)
+                    if (
+                        part[count].design == despage
+                        and part[count].voltage == voltages[position]
+                    ):
+
+                        print(
+                            "%17s   " % part[count].designname,
+                            file=resultfile,
+                            end='',
+                        )
+                        propage = 'A'
+                        while propage < 'M':
+                            if total[propage-ord('A')] != 0:
+                                print(
+                                    "%2d/%2d   " % (
+                                        fails[propage-ord('A')],
+                                        total[propage-ord('A')],
+                                    ),
+                                    file=resultfile,
+                                    end='',
+                                )
+                            else:
+                                print("        ", file=resultfile, end='')
+                            propage = chr(ord(propage) + 2)
+
+                        print(
+                            "\n                        ",
+                            file=resultfile,
+                            end="",
+                        )
+                        propage = 'B'
+                        while propage < 'N':
+                            if total[propage-ord('A')] != 0:
+                                print(
+                                    "%2d/%2d   " % (
+                                        fails[propage-ord('A')],
+                                        total[propage-ord('A')],
+                                    ),
+                                    file=resultfile,
+                                    end='',
+                                )
+                            else:
+                                print("        ", file=resultfile, end="")
+                            propage = chr(ord(propage) + 2)
+                        print(file=resultfile)
+                        for i in range(76):
+                            print("_", file=resultfile, end="")
+                        print("\n", file=resultfile)
+                        paglen = paglen + 3
+                        break
+                    count += 1
+                despage = chr(ord(despage) + 1)
+            position += 1
+        resultfile.close()
 
 
 def count_parts(argc, argv, part, part_count, tempstring):
